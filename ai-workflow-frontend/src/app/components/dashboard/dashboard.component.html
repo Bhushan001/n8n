@@ -1,47 +1,228 @@
-<div class="flex flex-col h-full">
-  <!-- Workflow Header -->
-  <div class="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
-    <div class="flex items-center space-x-3">
-      <h2 class="text-xl font-semibold text-gray-800">Workflow Canvas</h2>
-      <div class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-        Active
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p class="mt-2 text-gray-600">Welcome back! Here's an overview of your AI workflows</p>
+        </div>
+        <button
+          (click)="createNewWorkflow()"
+          class="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <app-icon name="plus" [size]="20"></app-icon>
+          <span>New Workflow</span>
+        </button>
       </div>
     </div>
-    <div class="flex items-center space-x-2 overflow-x-auto">
-      <button 
-        (click)="onNewWorkflow()"
-        class="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-        title="Create a new workflow (clears current canvas)"
-      >
-        <app-icon name="plus" [size]="16"></app-icon>
-        <span class="hidden sm:inline">New Workflow</span>
-        <span class="sm:hidden">New</span>
-      </button>
-      <button 
-        (click)="onSaveWorkflow()"
-        class="flex items-center space-x-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-        title="Save current workflow"
-      >
-        <app-icon name="save" [size]="16"></app-icon>
-        <span class="hidden sm:inline">Save</span>
-      </button>
-      <button 
-        (click)="onExecuteWorkflow()"
-        class="flex items-center space-x-2 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
-        title="Execute current workflow"
-      >
-        <app-icon name="play" [size]="16"></app-icon>
-        <span class="hidden sm:inline">Execute</span>
-      </button>
-      <div class="hidden lg:flex items-center space-x-2 px-3 py-2 bg-gray-100 rounded-lg">
-        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-        <span class="text-sm text-gray-600">Auto-save enabled</span>
-      </div>
-    </div>
-  </div>
 
-  <!-- Canvas Container -->
-  <div class="flex-1 min-h-0 relative">
-    <app-workflow-canvas></app-workflow-canvas>
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+              <app-icon name="workflow" [size]="20" className="text-white"></app-icon>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Total Workflows</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ stats.totalWorkflows }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+              <app-icon name="play" [size]="20" className="text-white"></app-icon>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Active Workflows</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ stats.activeWorkflows }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+              <app-icon name="zap" [size]="20" className="text-white"></app-icon>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Executions Today</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ stats.executionsToday }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+              <app-icon name="clock" [size]="20" className="text-white"></app-icon>
+            </div>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500">Avg Execution Time</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ stats.avgExecutionTime }}s</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity and Quick Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Recent Executions -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Recent Executions</h3>
+          </div>
+          <div class="p-6">
+            <div *ngIf="isLoading" class="space-y-4">
+              <div *ngFor="let i of [1,2,3]" class="flex items-center space-x-4 animate-pulse">
+                <div class="w-10 h-10 bg-gray-200 rounded-lg"></div>
+                <div class="flex-1">
+                  <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div *ngIf="!isLoading && recentExecutions.length > 0" class="space-y-4">
+              <div *ngFor="let execution of recentExecutions" class="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center" [class]="execution.statusClass">
+                  <app-icon [name]="execution.icon" [size]="20" className="text-white"></app-icon>
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-gray-900">{{ execution.workflowName }}</p>
+                  <p class="text-xs text-gray-500">{{ execution.startedAt | date:'short' }}</p>
+                </div>
+                <div class="text-right">
+                  <span [class]="'text-xs font-medium px-2 py-1 rounded-full ' + execution.statusBadgeClass">
+                    {{ execution.status }}
+                  </span>
+                  <p class="text-xs text-gray-500 mt-1">{{ execution.duration }}s</p>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="!isLoading && recentExecutions.length === 0" class="text-center py-8">
+              <app-icon name="play" [size]="48" className="text-gray-400 mx-auto mb-4"></app-icon>
+              <h3 class="text-lg font-medium text-gray-900 mb-2">No executions yet</h3>
+              <p class="text-gray-600">Start by creating and running your first workflow.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
+          </div>
+          <div class="p-6 space-y-4">
+            <button
+              (click)="createNewWorkflow()"
+              class="w-full flex items-center space-x-3 p-4 text-left bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+            >
+              <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                <app-icon name="plus" [size]="20" className="text-white"></app-icon>
+              </div>
+              <div>
+                <p class="font-medium">Create Workflow</p>
+                <p class="text-sm opacity-75">Build a new automation</p>
+              </div>
+            </button>
+
+      <button 
+              (click)="navigateToWorkflows()"
+              class="w-full flex items-center space-x-3 p-4 text-left bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
+            >
+              <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                <app-icon name="workflow" [size]="20" className="text-white"></app-icon>
+              </div>
+              <div>
+                <p class="font-medium">View Workflows</p>
+                <p class="text-sm opacity-75">Manage existing workflows</p>
+              </div>
+      </button>
+
+      <button 
+              (click)="navigateToExecutions()"
+              class="w-full flex items-center space-x-3 p-4 text-left bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors"
+            >
+              <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                <app-icon name="play" [size]="20" className="text-white"></app-icon>
+              </div>
+              <div>
+                <p class="font-medium">View Executions</p>
+                <p class="text-sm opacity-75">Monitor workflow runs</p>
+              </div>
+      </button>
+
+      <button 
+              (click)="navigateToSettings()"
+              class="w-full flex items-center space-x-3 p-4 text-left bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <div class="w-8 h-8 bg-gray-500 rounded-lg flex items-center justify-center">
+                <app-icon name="settings" [size]="20" className="text-white"></app-icon>
+              </div>
+              <div>
+                <p class="font-medium">Settings</p>
+                <p class="text-sm opacity-75">Configure your account</p>
+              </div>
+      </button>
+          </div>
+        </div>
+
+        <!-- Recent Workflows -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mt-6">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Recent Workflows</h3>
+          </div>
+          <div class="p-6">
+            <div *ngIf="isLoading" class="space-y-3">
+              <div *ngFor="let i of [1,2,3]" class="animate-pulse">
+                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+            
+            <div *ngIf="!isLoading && recentWorkflows.length > 0" class="space-y-3">
+              <div *ngFor="let workflow of recentWorkflows" class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="flex items-center space-x-3">
+                  <div class="w-8 h-8 rounded-lg flex items-center justify-center" [class]="workflow.colorClass">
+                    <app-icon [name]="workflow.icon" [size]="16" className="text-white"></app-icon>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">{{ workflow.name }}</p>
+                    <p class="text-xs text-gray-500">{{ workflow.updatedAt | date:'short' }}</p>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-1">
+                  <div [class]="'w-2 h-2 rounded-full ' + (workflow.isActive ? 'bg-green-500' : 'bg-gray-400')"></div>
+                  <span [class]="'text-xs font-medium ' + (workflow.isActive ? 'text-green-700' : 'text-gray-500')">
+                    {{ workflow.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="!isLoading && recentWorkflows.length === 0" class="text-center py-6">
+              <app-icon name="workflow" [size]="32" className="text-gray-400 mx-auto mb-2"></app-icon>
+              <p class="text-sm text-gray-600">No workflows yet</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

@@ -66,10 +66,10 @@
             </div>
             <div class="flex items-center space-x-1">
               <div
-                [class]="'w-2 h-2 rounded-full ' + (workflow.active ? 'bg-green-500' : 'bg-gray-400')"
+                [class]="'w-2 h-2 rounded-full ' + (workflow.isActive ? 'bg-green-500' : 'bg-gray-400')"
               ></div>
-              <span [class]="'text-xs font-medium ' + (workflow.active ? 'text-green-700' : 'text-gray-500')">
-                {{ workflow.active ? 'Active' : 'Inactive' }}
+              <span [class]="'text-xs font-medium ' + (workflow.isActive ? 'text-green-700' : 'text-gray-500')">
+                {{ workflow.isActive ? 'Active' : 'Inactive' }}
               </span>
             </div>
           </div>
@@ -94,7 +94,7 @@
             </button>
             <button
               (click)="runWorkflow(workflow)"
-              [disabled]="!workflow.active"
+              [disabled]="!workflow.isActive"
               class="flex items-center justify-center px-3 py-2 text-sm bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <app-icon name="play" [size]="16"></app-icon>
@@ -103,7 +103,7 @@
               (click)="toggleWorkflowStatus(workflow)"
               class="flex items-center justify-center px-3 py-2 text-sm bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              <app-icon [name]="workflow.active ? 'pause' : 'play'" [size]="16"></app-icon>
+              <app-icon [name]="workflow.isActive ? 'pause' : 'play'" [size]="16"></app-icon>
             </button>
             <button
               (click)="deleteWorkflow(workflow)"

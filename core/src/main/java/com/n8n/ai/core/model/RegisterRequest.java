@@ -19,6 +19,8 @@ public class RegisterRequest {
     @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password; // Will be hashed by the service
 
+    private String firstName;
+    private String lastName;
     private String phone;
     private String country;
     private String role = "USER"; // Default role

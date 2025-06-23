@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Entity
 @Table(name = "workflow_executions")
@@ -17,10 +18,24 @@ public class WorkflowExecution { // This entity is specifically for execution, n
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long workflowId; // Foreign key to Workflow
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private String status; // e.g., "RUNNING", "COMPLETED", "FAILED"
+    @Column(name = "started_at")
+    private LocalDateTime startedAt;
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
+    private String status; // "RUNNING", "COMPLETED", "FAILED", "CANCELLED"
 
     @Column(columnDefinition = "jsonb")
-    private String logsJson; // Stores execution logs as JSON string
+    private String input; // Input data for the workflow
+    
+    @Column(columnDefinition = "jsonb")
+    private String result; // Execution result
+    
+    @Column(columnDefinition = "jsonb")
+    private String error; // Error message if failed
+    
+    @Column(name = "execution_time")
+    private Long executionTime; // Execution time in milliseconds
+
+    @Column(columnDefinition = "jsonb")
+    private String logsJson; // Execution logs
 }

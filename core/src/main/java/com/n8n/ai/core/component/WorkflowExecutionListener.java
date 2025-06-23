@@ -27,9 +27,8 @@ public class WorkflowExecutionListener {
     private final WorkflowRepository workflowRepository;
     private final WorkflowExecutionRepository workflowExecutionRepository;
     private final NodeExecutionRepository nodeExecutionRepository;
-    private final AiAgentService aiAgentService; // Inject AI service
+    private final AiAgentService aiAgentService;
     private final ObjectMapper objectMapper;
-
 
     @RabbitListener(queues = "workflow-queue")
     public void processWorkflowExecution(String message) {
@@ -42,20 +41,26 @@ public class WorkflowExecutionListener {
         }
 
         Long workflowId = request.getWorkflowId();
-        Long executionId = request.getExecutionId();
+        
+        // Create a new execution record since we don't have executionId in the request anymore
+        WorkflowExecution execution = new WorkflowExecution();
+        execution.setWorkflowId(workflowId);
+        execution.setStatus("RUNNING");
+        execution.setStartedAt(LocalDateTime.now());
+        execution = workflowExecutionRepository.save(execution);
 
         Optional<Workflow> workflowOpt = workflowRepository.findById(workflowId);
-        Optional<WorkflowExecution> executionOpt = workflowExecutionRepository.findById(executionId);
 
-        if (workflowOpt.isEmpty() || executionOpt.isEmpty()) {
-            System.err.println("Workflow or Execution record not found for ID: " + workflowId + ", " + executionId);
+        if (workflowOpt.isEmpty()) {
+            System.err.println("Workflow not found for ID: " + workflowId);
+            execution.setStatus("FAILED");
+            execution.setCompletedAt(LocalDateTime.now());
+            execution.setError("Workflow not found");
+            workflowExecutionRepository.save(execution);
             return;
         }
 
         Workflow workflow = workflowOpt.get();
-        WorkflowExecution execution = executionOpt.get();
-        execution.setStatus("RUNNING");
-        workflowExecutionRepository.save(execution); // Update status to Running
 
         try {
             // Parse the workflow definition JSON
@@ -68,10 +73,9 @@ public class WorkflowExecutionListener {
             }
 
             // Simple execution: Find the trigger node and execute sequentially.
-            // A real n8n would have a more sophisticated DAG (Directed Acyclic Graph) executor.
             JsonNode triggerNode = null;
             for (JsonNode node : nodesNode) {
-                if (node.get("type").asText().contains("trigger")) { // Simplified check for trigger
+                if (node.get("type").asText().contains("trigger")) {
                     triggerNode = node;
                     break;
                 }
@@ -84,10 +88,8 @@ public class WorkflowExecutionListener {
             // This map holds the output of executed nodes, acting as context
             Map<String, JsonNode> executionContext = new HashMap<>();
 
-            // Execute nodes in a simplified sequential order (for a real app, use a proper DAG traversal)
-            // For simplicity, we'll just execute nodes in the order they appear after the trigger
-            // A robust solution needs to follow the 'edges' to determine execution order.
-            executeNode(triggerNode, execution, executionContext); // Execute trigger first (might not produce output relevant for next node directly)
+            // Execute nodes in a simplified sequential order
+            executeNode(triggerNode, execution, executionContext);
 
             // Iterate through nodes based on edges (simplified)
             JsonNode currentNode = triggerNode;
@@ -112,18 +114,19 @@ public class WorkflowExecutionListener {
                     executeNode(nextNode, execution, executionContext);
                     currentNode = nextNode;
                 } else {
-                    currentNode = null; // No more nodes to execute
+                    currentNode = null;
                 }
             }
 
-
             execution.setStatus("COMPLETED");
-            execution.setEndTime(LocalDateTime.now());
+            execution.setCompletedAt(LocalDateTime.now());
             workflowExecutionRepository.save(execution);
 
         } catch (Exception e) {
             execution.setStatus("FAILED");
-            execution.setEndTime(LocalDateTime.now());
+            execution.setCompletedAt(LocalDateTime.now());
+            execution.setError("Workflow failed: " + e.getMessage());
+            
             // Append error to logsJson for the overall workflow execution
             try {
                 JsonNode currentLogs = execution.getLogsJson() != null ? objectMapper.readTree(execution.getLogsJson()) : objectMapper.createArrayNode();
@@ -152,9 +155,8 @@ public class WorkflowExecutionListener {
         nodeExecution.setNodeType(nodeType);
         nodeExecution.setStartTime(LocalDateTime.now());
         nodeExecution.setStatus("RUNNING");
-        // Store input data - for initial trigger, it might be empty or a fixed event object
         nodeExecution.setInputDataJson(objectMapper.writeValueAsString(executionContext));
-        nodeExecutionRepository.save(nodeExecution); // Save to get ID
+        nodeExecutionRepository.save(nodeExecution);
 
         String outputData = null;
         String errorMessage = null;
@@ -163,39 +165,28 @@ public class WorkflowExecutionListener {
         try {
             switch (nodeType) {
                 case "trigger":
-                    // Trigger nodes typically start the flow, their output might be initial event data
                     outputData = objectMapper.writeValueAsString(Map.of("message", "Workflow started by trigger."));
                     break;
                 case "httpRequest":
-                    // Simulate HTTP Request. In a real app, use RestClient.
                     String url = nodeConfig.get("url").asText();
                     System.out.println("Executing HTTP Request to: " + url);
-                    // Actual HTTP call would go here. For example:
-                    // String response = restClient.get().uri(url).retrieve().body(String.class);
-                    // outputData = response;
                     outputData = objectMapper.writeValueAsString(Map.of("data", "Mock data from " + url));
                     break;
                 case "aiAgent":
                     Long aiAgentConfigId = nodeConfig.get("agentId").asLong();
                     String promptTemplate = nodeConfig.get("prompt").asText();
-
-                    // Resolve placeholders in prompt (e.g., {{$node.prevNodeId.data.field}})
-                    // This is a simplified example; a full-fledged templating engine (like Handlebars.java) would be needed
                     String actualPrompt = resolvePromptPlaceholders(promptTemplate, executionContext);
 
-                    // Pass along any dynamic AI config parameters from the workflow node itself
                     Map<String, Object> aiCallConfig = new HashMap<>();
                     if (nodeConfig.has("model")) aiCallConfig.put("model", nodeConfig.get("model").asText());
                     if (nodeConfig.has("temperature")) aiCallConfig.put("temperature", nodeConfig.get("temperature").asDouble());
                     if (nodeConfig.has("max_output_tokens")) aiCallConfig.put("maxOutputTokens", nodeConfig.get("max_output_tokens").asInt());
-
 
                     System.out.println("Executing AI Agent with prompt: " + actualPrompt);
                     String aiResponse = aiAgentService.executeAiAgent(aiAgentConfigId, actualPrompt, aiCallConfig);
                     outputData = objectMapper.writeValueAsString(Map.of("summary", aiResponse));
                     break;
                 case "sendEmail":
-                    // Simulate Send Email
                     String to = nodeConfig.get("to").asText();
                     String subject = nodeConfig.get("subject").asText();
                     String bodyTemplate = nodeConfig.get("body").asText();
@@ -213,7 +204,7 @@ public class WorkflowExecutionListener {
             errorMessage = e.getMessage();
             System.err.println("Node " + nodeId + " failed: " + errorMessage);
             e.printStackTrace();
-            throw e; // Re-throw to mark overall workflow as failed
+            throw e;
         } finally {
             nodeExecution.setEndTime(LocalDateTime.now());
             nodeExecution.setStatus(status);
@@ -222,7 +213,7 @@ public class WorkflowExecutionListener {
             nodeExecutionRepository.save(nodeExecution);
 
             // Update overall workflow execution logs
-            WorkflowExecution currentExecution = workflowExecutionRepository.findById(workflowExecution.getId()).orElse(workflowExecution); // Re-fetch to ensure latest
+            WorkflowExecution currentExecution = workflowExecutionRepository.findById(workflowExecution.getId()).orElse(workflowExecution);
             try {
                 JsonNode currentLogs = currentExecution.getLogsJson() != null ? objectMapper.readTree(currentExecution.getLogsJson()) : objectMapper.createArrayNode();
                 ((com.fasterxml.jackson.databind.node.ArrayNode) currentLogs).add(objectMapper.createObjectNode()
@@ -262,6 +253,5 @@ public class WorkflowExecutionListener {
         }
         return resolved;
     }
-
 }
 

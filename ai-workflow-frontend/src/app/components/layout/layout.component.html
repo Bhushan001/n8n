@@ -174,67 +174,10 @@
           </nav>
         </div>
 
-        <!-- Node Types (only show on dashboard) -->
-        <div *ngIf="isDashboardRoute()">
-          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Node Types</h3>
-          <div class="space-y-1">
-            <div
-              draggable="true"
-              (dragstart)="onNodeDragStart($event, 'trigger')"
-              class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-green-50 hover:text-green-700 cursor-grab active:cursor-grabbing transition-colors group"
-            >
-              <div class="w-3 h-3 bg-green-500 rounded-full group-hover:scale-110 transition-transform"></div>
-              <span class="text-sm font-medium">Trigger</span>
-              <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                <app-icon name="plus" [size]="14" className="text-green-600"></app-icon>
-              </div>
-            </div>
-            <div
-              draggable="true"
-              (dragstart)="onNodeDragStart($event, 'action')"
-              class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 cursor-grab active:cursor-grabbing transition-colors group"
-            >
-              <div class="w-3 h-3 bg-blue-500 rounded-full group-hover:scale-110 transition-transform"></div>
-              <span class="text-sm font-medium">Action</span>
-              <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                <app-icon name="plus" [size]="14" className="text-blue-600"></app-icon>
-              </div>
-            </div>
-            <div
-              draggable="true"
-              (dragstart)="onNodeDragStart($event, 'condition')"
-              class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-orange-700 cursor-grab active:cursor-grabbing transition-colors group"
-            >
-              <div class="w-3 h-3 bg-orange-500 rounded-full group-hover:scale-110 transition-transform"></div>
-              <span class="text-sm font-medium">Condition</span>
-              <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                <app-icon name="plus" [size]="14" className="text-orange-600"></app-icon>
-              </div>
-            </div>
-            <div
-              draggable="true"
-              (dragstart)="onNodeDragStart($event, 'ai-agent')"
-              class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-purple-50 hover:text-purple-700 cursor-grab active:cursor-grabbing transition-colors group"
-            >
-              <div class="w-3 h-3 bg-purple-500 rounded-full group-hover:scale-110 transition-transform"></div>
-              <span class="text-sm font-medium">AI Agent</span>
-              <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                <app-icon name="plus" [size]="14" className="text-purple-600"></app-icon>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Quick Actions -->
         <div>
           <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Quick Actions</h3>
           <div class="space-y-2">
-            <button 
-              (click)="onNewWorkflowFromSidebar()"
-              class="w-full flex items-center space-x-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <app-icon name="plus" [size]="16"></app-icon>
-              <span>New Workflow</span>
-            </button>
             <button 
               (click)="navigateAndCloseSidebar('/workflows')"
               class="w-full flex items-center space-x-2 px-3 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">

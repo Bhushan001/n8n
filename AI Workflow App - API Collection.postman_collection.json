@@ -22,10 +22,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"phone\": \"1234567890\",\n    \"country\": \"USA\"\n}"
+							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phone\": \"1234567890\",\n    \"country\": \"USA\"\n}"
 						},
 						"url": "{{protocol}}://{{host}}:{{port}}/{{basePath}}/auth/register",
-						"description": "Registers a new user with the application."
+						"description": "Registers a new user with the application. Now includes firstName and lastName fields."
 					},
 					"response": [
 						{
@@ -40,7 +40,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"phone\": \"1234567890\",\n    \"country\": \"USA\"\n}"
+									"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phone\": \"1234567890\",\n    \"country\": \"USA\"\n}"
 								},
 								"url": "{{host}}:{{port}}/{{basePath}}/auth/register"
 							},
@@ -54,7 +54,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"id\": 1,\n    \"email\": \"test@example.com\",\n    \"username\": \"testuser\",\n    \"phone\": \"1234567890\",\n    \"country\": \"USA\",\n    \"role\": \"USER\",\n    \"createdBy\": \"system\",\n    \"createdAt\": \"2023-01-01T10:00:00\",\n    \"lastModifiedBy\": \"system\",\n    \"updatedAt\": \"2023-01-01T10:00:00\"\n}"
+							"body": "{\n    \"id\": 1,\n    \"email\": \"test@example.com\",\n    \"username\": \"testuser\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phone\": \"1234567890\",\n    \"country\": \"USA\",\n    \"role\": \"USER\",\n    \"createdBy\": \"system\",\n    \"createdAt\": \"2023-01-01T10:00:00\",\n    \"lastModifiedBy\": \"system\",\n    \"updatedAt\": \"2023-01-01T10:00:00\"\n}"
 						}
 					]
 				},
@@ -85,7 +85,7 @@
 							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
 						},
 						"url": "{{protocol}}://{{host}}:{{port}}/{{basePath}}/auth/login",
-						"description": "Authenticates a user and retrieves a JWT token."
+						"description": "Authenticates a user and retrieves a JWT token. The token now includes firstName and lastName claims."
 					},
 					"response": [
 						{
@@ -115,6 +115,356 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"jwtToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNjc4OTAyMjIyLCJleHAiOjE2Nzg5ODg2MjJ9.SOME_FAKE_JWT_TOKEN\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": "{{protocol}}://{{host}}:{{port}}/{{basePath}}/auth/me",
+						"description": "Retrieves the current authenticated user's profile information."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": "{{host}}:{{port}}/{{basePath}}/auth/me"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"email\": \"test@example.com\",\n    \"username\": \"testuser\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phone\": \"1234567890\",\n    \"country\": \"USA\",\n    \"role\": \"USER\",\n    \"createdBy\": \"system\",\n    \"createdAt\": \"2023-01-01T10:00:00\",\n    \"lastModifiedBy\": \"system\",\n    \"updatedAt\": \"2023-01-01T10:00:00\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{protocol}}://{{host}}:{{port}}/{{basePath}}/auth/users",
+						"description": "Retrieves all users in the system. This is a public endpoint - no authentication required. Password hashes are excluded from the response."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{host}}:{{port}}/{{basePath}}/auth/users"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"email\": \"test@example.com\",\n        \"username\": \"testuser\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"phone\": \"1234567890\",\n        \"country\": \"USA\",\n        \"role\": \"USER\",\n        \"createdBy\": \"system\",\n        \"createdAt\": \"2023-01-01T10:00:00\",\n        \"lastModifiedBy\": \"system\",\n        \"updatedAt\": \"2023-01-01T10:00:00\"\n    },\n    {\n        \"id\": 2,\n        \"email\": \"admin@example.com\",\n        \"username\": \"admin\",\n        \"firstName\": \"Admin\",\n        \"lastName\": \"User\",\n        \"phone\": \"9876543210\",\n        \"country\": \"USA\",\n        \"role\": \"ADMIN\",\n        \"createdBy\": \"system\",\n        \"createdAt\": \"2023-01-01T11:00:00\",\n        \"lastModifiedBy\": \"system\",\n        \"updatedAt\": \"2023-01-01T11:00:00\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Delete User by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": "{{protocol}}://{{host}}:{{port}}/{{basePath}}/auth/users/1",
+						"description": "Deletes a user by their ID. Replace '1' with an actual user ID. Requires JWT authentication."
+					},
+					"response": [
+						{
+							"name": "Successful Deletion",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": "{{host}}:{{port}}/{{basePath}}/auth/users/1"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"User deleted successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete User by Email",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": "{{protocol}}://{{host}}:{{port}}/{{basePath}}/auth/users/email/test@example.com",
+						"description": "Deletes a user by their email address. Replace 'test@example.com' with an actual email. Requires JWT authentication."
+					},
+					"response": [
+						{
+							"name": "Successful Deletion",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"url": "{{host}}:{{port}}/{{basePath}}/auth/users/email/test@example.com"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"User deleted successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"your-refresh-token-here\"\n}"
+						},
+						"url": "{{protocol}}://{{host}}:{{port}}/{{basePath}}/auth/refresh",
+						"description": "Refreshes the JWT token using a refresh token. The new token will include firstName and lastName claims."
+					},
+					"response": [
+						{
+							"name": "Successful Refresh",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"refreshToken\": \"your-refresh-token-here\"\n}"
+								},
+								"url": "{{host}}:{{port}}/{{basePath}}/auth/refresh"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"jwtToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNjc4OTAyMjIyLCJleHAiOjE2Nzg5ODg2MjJ9.NEW_FAKE_JWT_TOKEN\",\n    \"refreshToken\": \"new-refresh-token-here\",\n    \"expiresIn\": 3600\n}"
+						}
+					]
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"currentPassword\": \"password123\",\n    \"newPassword\": \"newpassword456\"\n}"
+						},
+						"url": "{{protocol}}://{{host}}:{{port}}/{{basePath}}/auth/change-password",
+						"description": "Changes the current user's password. Requires JWT authentication."
+					},
+					"response": [
+						{
+							"name": "Successful Password Change",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"currentPassword\": \"password123\",\n    \"newPassword\": \"newpassword456\"\n}"
+								},
+								"url": "{{host}}:{{port}}/{{basePath}}/auth/change-password"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Password changed successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\"\n}"
+						},
+						"url": "{{protocol}}://{{host}}:{{port}}/{{basePath}}/auth/forgot-password",
+						"description": "Initiates a password reset process for the specified email address."
+					},
+					"response": [
+						{
+							"name": "Successful Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"test@example.com\"\n}"
+								},
+								"url": "{{host}}:{{port}}/{{basePath}}/auth/forgot-password"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Password reset instructions sent to your email\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"reset-token-here\",\n    \"newPassword\": \"newpassword456\"\n}"
+						},
+						"url": "{{protocol}}://{{host}}:{{port}}/{{basePath}}/auth/reset-password",
+						"description": "Resets the password using a reset token received via email."
+					},
+					"response": [
+						{
+							"name": "Successful Reset",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"token\": \"reset-token-here\",\n    \"newPassword\": \"newpassword456\"\n}"
+								},
+								"url": "{{host}}:{{port}}/{{basePath}}/auth/reset-password"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Password reset successfully\"\n}"
 						}
 					]
 				}
@@ -361,7 +711,7 @@
 		},
 		{
 			"key": "port",
-			"value": "9081",
+			"value": "8080",
 			"type": "string"
 		},
 		{

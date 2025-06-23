@@ -26,6 +26,89 @@ export class LayoutComponent implements OnInit, OnDestroy {
   currentRoute = '';
   pageTitle = '';
   isLoadingUser = true;
+  private profileLoaded = false;
+
+  // Node palette data
+  triggerNodes = [
+    {
+      name: 'Webhook',
+      type: 'webhook',
+      category: 'trigger',
+      description: 'Trigger workflow via HTTP webhook',
+      icon: 'webhook',
+      colorClass: 'bg-green-500'
+    },
+    {
+      name: 'Schedule',
+      type: 'schedule',
+      category: 'trigger',
+      description: 'Trigger workflow on a schedule',
+      icon: 'clock',
+      colorClass: 'bg-blue-500'
+    },
+    {
+      name: 'Manual',
+      type: 'manual',
+      category: 'trigger',
+      description: 'Trigger workflow manually',
+      icon: 'play',
+      colorClass: 'bg-purple-500'
+    }
+  ];
+
+  actionNodes = [
+    {
+      name: 'HTTP Request',
+      type: 'http',
+      category: 'action',
+      description: 'Make HTTP requests to external APIs',
+      icon: 'globe',
+      colorClass: 'bg-blue-500'
+    },
+    {
+      name: 'Email',
+      type: 'email',
+      category: 'action',
+      description: 'Send emails via SMTP',
+      icon: 'mail',
+      colorClass: 'bg-green-500'
+    },
+    {
+      name: 'Database',
+      type: 'database',
+      category: 'action',
+      description: 'Execute database queries',
+      icon: 'database',
+      colorClass: 'bg-orange-500'
+    }
+  ];
+
+  aiNodes = [
+    {
+      name: 'OpenAI',
+      type: 'openai',
+      category: 'ai',
+      description: 'Generate text using OpenAI models',
+      icon: 'brain',
+      colorClass: 'bg-purple-500'
+    },
+    {
+      name: 'Image Generation',
+      type: 'image-gen',
+      category: 'ai',
+      description: 'Generate images using AI models',
+      icon: 'image',
+      colorClass: 'bg-pink-500'
+    },
+    {
+      name: 'Text Analysis',
+      type: 'text-analysis',
+      category: 'ai',
+      description: 'Analyze text sentiment and extract entities',
+      icon: 'search',
+      colorClass: 'bg-indigo-500'
+    }
+  ];
 
   constructor(
     private authService: AuthService,
@@ -40,8 +123,8 @@ export class LayoutComponent implements OnInit, OnDestroy {
       this.currentUser = user;
       this.isLoadingUser = false;
       
-      // If user is logged in, try to fetch additional profile info
-      if (user) {
+      // If user is logged in and profile hasn't been loaded yet, fetch additional profile info
+      if (user && !this.profileLoaded) {
         this.loadUserProfile();
       }
     });
@@ -69,11 +152,13 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.userService.getCurrentUserProfile().subscribe({
       next: (profile) => {
         this.userProfile = profile;
+        this.profileLoaded = true;
         // Update the auth service with the complete profile
         this.authService.updateUserInfo(profile);
       },
       error: (error) => {
         console.log('Could not load user profile:', error);
+        this.profileLoaded = true;
         // This is not critical, we can continue with basic user info
       }
     });
@@ -141,8 +226,8 @@ export class LayoutComponent implements OnInit, OnDestroy {
     }
   }
 
-  onNodeDragStart(event: DragEvent, nodeType: string): void {
-    event.dataTransfer?.setData('text/plain', nodeType);
+  onNodeDragStart(event: DragEvent, node: any): void {
+    event.dataTransfer?.setData('application/json', JSON.stringify(node));
   }
 
   isActiveRoute(route: string): boolean {
@@ -161,9 +246,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
   }
 
   onNewWorkflowFromSidebar(): void {
-    this.router.navigate(['/dashboard']).then(() => {
-      window.dispatchEvent(new CustomEvent('newWorkflow'));
-    });
+    this.router.navigate(['/workflow-editor']);
     
     if (this.isMobile) {
       this.closeSidenav();
@@ -172,12 +255,30 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   // Helper methods for user display
   getUserDisplayName(): string {
+    // Try userProfile first
     if (this.userProfile) {
-      return `${this.userProfile.firstName} ${this.userProfile.lastName}`.trim();
+      const firstName = this.userProfile.firstName || '';
+      const lastName = this.userProfile.lastName || '';
+      const fullName = `${firstName} ${lastName}`.trim();
+      if (fullName) {
+        return fullName;
+      }
+      // Fallback to username if no name is available
+      return this.userProfile.username || 'User';
     }
+    
+    // Try currentUser as fallback
     if (this.currentUser) {
-      return `${this.currentUser.firstName} ${this.currentUser.lastName}`.trim();
+      const firstName = this.currentUser.firstName || '';
+      const lastName = this.currentUser.lastName || '';
+      const fullName = `${firstName} ${lastName}`.trim();
+      if (fullName) {
+        return fullName;
+      }
+      // Fallback to username if no name is available
+      return this.currentUser.username || 'User';
     }
+    
     return 'User';
   }
 
@@ -188,9 +289,21 @@ export class LayoutComponent implements OnInit, OnDestroy {
   getUserInitials(): string {
     const user = this.userProfile || this.currentUser;
     if (user) {
-      const firstInitial = user.firstName?.charAt(0)?.toUpperCase() || '';
-      const lastInitial = user.lastName?.charAt(0)?.toUpperCase() || '';
-      return firstInitial + lastInitial;
+      const firstName = user.firstName || '';
+      const lastName = user.lastName || '';
+      const firstInitial = firstName.charAt(0)?.toUpperCase() || '';
+      const lastInitial = lastName.charAt(0)?.toUpperCase() || '';
+      
+      if (firstInitial && lastInitial) {
+        return firstInitial + lastInitial;
+      } else if (firstInitial) {
+        return firstInitial;
+      } else if (lastInitial) {
+        return lastInitial;
+      } else if (user.username) {
+        // Fallback to username initials
+        return user.username.charAt(0).toUpperCase();
+      }
     }
     return 'U';
   }
