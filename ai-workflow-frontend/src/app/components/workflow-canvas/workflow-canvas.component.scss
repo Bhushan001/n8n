@@ -1,0 +1,82 @@
+.canvas-container {
+  @apply relative w-full h-full overflow-hidden bg-gray-50;
+  min-height: 100%;
+}
+
+.workflow-canvas {
+  @apply w-full h-full cursor-grab;
+  display: block;
+  
+  &:active {
+    @apply cursor-grabbing;
+  }
+}
+
+.canvas-controls {
+  @apply absolute top-4 right-4 flex flex-col space-y-2 z-20;
+  
+  .control-btn {
+    @apply w-10 h-10 bg-white rounded-lg shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all duration-200 cursor-pointer;
+    
+    &:hover {
+      @apply shadow-lg bg-blue-50;
+      transform: translateY(-1px);
+      
+      app-icon {
+        @apply text-blue-600;
+      }
+    }
+    
+    &:active {
+      transform: translateY(0);
+      @apply shadow-md;
+    }
+    
+    &:focus {
+      @apply outline-none ring-2 ring-blue-500 ring-opacity-50;
+    }
+  }
+}
+
+.canvas-info {
+  @apply absolute bottom-4 left-4 bg-white px-3 py-2 rounded-lg shadow-md border border-gray-200 flex space-x-4 text-sm text-gray-600 z-20;
+  
+  span {
+    @apply font-medium;
+  }
+}
+
+// Ensure the host element takes full height
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+// Prevent text selection during dragging
+.canvas-container {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+// Custom animations
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+// Smooth transitions for all interactive elements
+button, .control-btn {
+  transition: all 0.2s ease-in-out;
+}

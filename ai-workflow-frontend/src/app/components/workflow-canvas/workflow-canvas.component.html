@@ -1,0 +1,45 @@
+<div class="canvas-container" #canvasContainer>
+  <canvas #canvas class="workflow-canvas"></canvas>
+  
+  <!-- Canvas Controls -->
+  <div class="canvas-controls">
+    <button class="control-btn" (click)="zoomIn()" title="Zoom In">
+      <app-icon name="plus" [size]="16" className="text-gray-600"></app-icon>
+    </button>
+    <button class="control-btn" (click)="zoomOut()" title="Zoom Out">
+      <app-icon name="minus" [size]="16" className="text-gray-600"></app-icon>
+    </button>
+    <button class="control-btn" (click)="resetZoom()" title="Reset Zoom">
+      <app-icon name="maximize" [size]="16" className="text-gray-600"></app-icon>
+    </button>
+    <button class="control-btn" (click)="fitToScreen()" title="Fit to Screen">
+      <app-icon name="fit-screen" [size]="16" className="text-gray-600"></app-icon>
+    </button>
+  </div>
+  
+  <!-- Canvas Info -->
+  <div class="canvas-info">
+    <span>Zoom: {{ (scale * 100).toFixed(0) }}%</span>
+    <span>Nodes: {{ nodes.length }}</span>
+  </div>
+
+  <!-- Context Menu -->
+  <app-context-menu
+    [visible]="showContextMenu"
+    [position]="contextMenuPosition"
+    [items]="contextMenuItems"
+    (itemClick)="onContextMenuItemClick($event)"
+    (close)="closeContextMenu()"
+  ></app-context-menu>
+
+  <!-- Inline Rename Input -->
+  <input
+    *ngIf="isRenaming && renamingNodeId"
+    [id]="'rename-input-' + renamingNodeId"
+    [(ngModel)]="tempNodeName"
+    (keydown)="onRenameKeyDown($event)"
+    (blur)="onRenameBlur()"
+    class="absolute bg-white border border-blue-500 rounded px-2 py-1 text-sm font-medium text-center shadow-lg z-50"
+    style="pointer-events: auto;"
+  />
+</div>

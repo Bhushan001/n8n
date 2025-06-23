@@ -1,0 +1,270 @@
+.dashboard-container {
+  @apply h-screen flex flex-col;
+}
+
+.dashboard-header {
+  @apply shadow-md z-10;
+  
+  .logo-section {
+    @apply flex items-center space-x-2 ml-4;
+    
+    .logo-icon {
+      @apply text-2xl;
+    }
+    
+    .app-title {
+      @apply text-xl font-semibold;
+    }
+  }
+  
+  .spacer {
+    @apply flex-1;
+  }
+  
+  .user-section {
+    @apply flex items-center space-x-2;
+    
+    .user-name {
+      @apply text-sm font-medium;
+    }
+  }
+}
+
+.dashboard-content {
+  @apply flex-1;
+}
+
+.dashboard-sidenav {
+  @apply w-64 border-r;
+  
+  .node-item {
+    @apply cursor-grab transition-colors duration-200;
+    
+    &:hover {
+      @apply bg-gray-100;
+    }
+    
+    &:active {
+      @apply cursor-grabbing;
+    }
+    
+    .trigger-icon {
+      @apply text-green-600;
+    }
+    
+    .action-icon {
+      @apply text-blue-600;
+    }
+    
+    .condition-icon {
+      @apply text-orange-600;
+    }
+    
+    .ai-icon {
+      @apply text-purple-600;
+    }
+  }
+}
+
+.main-content {
+  @apply flex flex-col;
+}
+
+.workflow-header {
+  @apply flex justify-between items-center p-4 border-b bg-white;
+  
+  h2 {
+    @apply text-2xl font-semibold text-gray-800 m-0;
+  }
+  
+  .workflow-actions {
+    @apply flex space-x-2;
+    
+    button {
+      @apply flex items-center space-x-1;
+    }
+  }
+}
+
+::ng-deep {
+  .mat-toolbar {
+    height: 64px !important;
+  }
+  
+  .mat-sidenav-container {
+    background: transparent !important;
+  }
+  
+  .mat-sidenav {
+    border-right: 1px solid #e0e0e0 !important;
+  }
+}
+
+// Ensure full height layout
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+// Custom scrollbar for sidebar
+aside {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+aside::-webkit-scrollbar {
+  width: 4px;
+}
+
+aside::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+aside::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 2px;
+}
+
+// Ensure main content takes full height
+main {
+  height: 100%;
+  min-height: 0; // Important for flex children
+  width: 100%;
+  min-width: 0; // Important for flex children
+}
+
+// Canvas container should take remaining height
+.canvas-container {
+  flex: 1;
+  min-height: 0; // Important for flex children
+}
+
+// User menu container for click outside detection
+.user-menu-container {
+  position: relative;
+}
+
+// Mobile responsive adjustments
+@media (max-width: 1023px) {
+  .sidebar-mobile {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+}
+
+// Enhanced hover effects for navigation items
+nav a {
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+  
+  &:hover::before,
+  &.active::before {
+    transform: translateX(0);
+  }
+}
+
+// Node type drag indicators
+.node-type-item {
+  position: relative;
+  
+  &:hover {
+    .drag-indicator {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .drag-indicator {
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.2s ease;
+  }
+}
+
+// Quick actions section styling
+.quick-actions {
+  button {
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    &:hover::before {
+      left: 100%;
+    }
+  }
+}
+
+// Status indicator animation
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+// Focus styles for accessibility
+button:focus {
+  outline: none;
+}
+
+// Improved button group spacing
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+  
+  @media (max-width: 640px) {
+    gap: 0.25rem;
+    
+    button {
+      padding: 0.5rem;
+      
+      span {
+        display: none;
+      }
+    }
+  }
+}
+
+// Smooth transitions
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+// Button hover effects
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}

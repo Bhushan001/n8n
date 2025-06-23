@@ -1,0 +1,38 @@
+// Toggle switch styling
+.peer:checked ~ div {
+  background-color: #2563eb;
+}
+
+.peer:checked ~ div:after {
+  transform: translateX(100%);
+  border-color: white;
+}
+
+// Tab transition effects
+nav button {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateX(2px);
+  }
+}
+
+// Form elements
+input, select {
+  transition: all 0.2s ease-in-out;
+  
+  &:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+}
+
+// Usage cards
+.usage-card {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+}

@@ -1,0 +1,133 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <!-- Login Card -->
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-10 text-center">
+        <div class="flex justify-center mb-4">
+          <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+            <app-icon name="workflow" [size]="32" className="text-white"></app-icon>
+          </div>
+        </div>
+        <h1 class="text-3xl font-bold text-white mb-2">AI Workflow</h1>
+        <p class="text-blue-100 text-sm">Build intelligent automation workflows</p>
+      </div>
+
+      <!-- Form -->
+      <div class="px-8 py-8">
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-2">Welcome Back</h2>
+          <p class="text-gray-600 text-sm">Sign in to continue to your dashboard</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+          <!-- Email Field -->
+          <div class="space-y-2">
+            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <app-icon name="mail" [size]="20" className="text-gray-400"></app-icon>
+              </div>
+              <input
+                id="email"
+                type="email"
+                formControlName="email"
+                placeholder="Enter your email"
+                [class]="'w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ' + 
+                        (hasFieldError('email') ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300')"
+              />
+            </div>
+            <p *ngIf="hasFieldError('email')" class="text-sm text-red-600">
+              {{ getFieldError('email') }}
+            </p>
+          </div>
+
+          <!-- Password Field -->
+          <div class="space-y-2">
+            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <app-icon name="lock" [size]="20" className="text-gray-400"></app-icon>
+              </div>
+              <input
+                id="password"
+                [type]="hidePassword ? 'password' : 'text'"
+                formControlName="password"
+                placeholder="Enter your password"
+                [class]="'w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ' + 
+                        (hasFieldError('password') ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300')"
+              />
+              <button
+                type="button"
+                (click)="togglePasswordVisibility()"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 transition-colors"
+              >
+                <app-icon [name]="hidePassword ? 'eye-off' : 'eye'" [size]="20" className="text-gray-400"></app-icon>
+              </button>
+            </div>
+            <p *ngIf="hasFieldError('password')" class="text-sm text-red-600">
+              {{ getFieldError('password') }}
+            </p>
+          </div>
+
+          <!-- Remember Me & Forgot Password -->
+          <div class="flex items-center justify-between">
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                formControlName="rememberMe"
+                class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <span class="text-sm text-gray-600">Remember me</span>
+            </label>
+            <button type="button" class="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors">
+              Forgot password?
+            </button>
+          </div>
+
+          <!-- Error Message -->
+          <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3">
+            <app-icon name="alert-circle" [size]="20" className="text-red-500 mt-0.5 flex-shrink-0"></app-icon>
+            <div>
+              <p class="text-red-800 text-sm font-medium">Sign in failed</p>
+              <p class="text-red-600 text-sm">{{ errorMessage }}</p>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            [disabled]="!loginForm.valid || isLoading"
+            class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+          >
+            <app-icon *ngIf="isLoading" name="loader" [size]="20" className="animate-spin"></app-icon>
+            <span>{{ isLoading ? 'Signing In...' : 'Sign In' }}</span>
+          </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="relative my-8">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-200"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-4 bg-white text-gray-500">New to AI Workflow?</span>
+          </div>
+        </div>
+
+        <!-- Sign Up Button -->
+        <button
+          type="button"
+          class="w-full py-3 px-4 border border-gray-300 rounded-lg text-gray-700 bg-gray-50 hover:bg-gray-100 font-medium transition-colors duration-200"
+        >
+          Create an Account
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center mt-8 text-sm text-gray-500">
+      <p>&copy; 2024 AI Workflow. All rights reserved.</p>
+    </div>
+  </div>
+</div>

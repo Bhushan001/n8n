@@ -1,0 +1,118 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Workflow Executions</h1>
+      <p class="mt-2 text-gray-600">Monitor and track your workflow execution history</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-6 flex flex-col sm:flex-row gap-4">
+      <div class="flex space-x-2">
+        <button
+          *ngFor="let status of ['all', 'running', 'completed', 'failed', 'cancelled']"
+          (click)="selectedStatus = status"
+          [class]="'px-4 py-2 rounded-lg text-sm font-medium transition-colors ' + 
+                   (selectedStatus === status ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50')"
+        >
+          {{ status | titlecase }}
+        </button>
+      </div>
+      <button
+        (click)="loadExecutions()"
+        class="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+      >
+        <app-icon name="refresh" [size]="16"></app-icon>
+        <span>Refresh</span>
+      </button>
+    </div>
+
+    <!-- Executions Table -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Workflow
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Started
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Duration
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Trigger
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngIf="isLoading" class="animate-pulse">
+              <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                Loading executions...
+              </td>
+            </tr>
+            <tr *ngFor="let execution of filteredExecutions" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900">{{ execution.workflowName }}</div>
+                <div class="text-sm text-gray-500">ID: {{ execution.id }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span [class]="'inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-medium ' + getStatusColor(execution.status)">
+                  <app-icon [name]="getStatusIcon(execution.status)" [size]="12" [className]="execution.status === 'running' ? 'animate-spin' : ''"></app-icon>
+                  <span>{{ execution.status | titlecase }}</span>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ execution.startTime | date:'medium' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <span *ngIf="execution.duration">{{ formatDuration(execution.duration) }}</span>
+                <span *ngIf="!execution.duration && execution.status === 'running'" class="text-blue-600">Running...</span>
+                <span *ngIf="!execution.duration && execution.status !== 'running'">-</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ execution.trigger }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex items-center justify-end space-x-2">
+                  <button
+                    *ngIf="execution.status === 'running'"
+                    (click)="cancelExecution(execution)"
+                    class="text-red-600 hover:text-red-900 transition-colors"
+                  >
+                    <app-icon name="x" [size]="16"></app-icon>
+                  </button>
+                  <button
+                    *ngIf="execution.status === 'failed'"
+                    (click)="retryExecution(execution)"
+                    class="text-blue-600 hover:text-blue-900 transition-colors"
+                  >
+                    <app-icon name="refresh" [size]="16"></app-icon>
+                  </button>
+                  <button class="text-gray-600 hover:text-gray-900 transition-colors">
+                    <app-icon name="eye" [size]="16"></app-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && filteredExecutions.length === 0" class="text-center py-12">
+      <app-icon name="play" [size]="48" className="text-gray-400 mx-auto mb-4"></app-icon>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No executions found</h3>
+      <p class="text-gray-600">No workflow executions match the selected criteria.</p>
+    </div>
+  </div>
+</div>
