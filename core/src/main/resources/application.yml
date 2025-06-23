@@ -1,0 +1,43 @@
+server:
+  port: 9081
+
+spring:
+  application:
+    name: core
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ai_workflow_db
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+gemini:
+  api:
+    key: AIzaSyAJ9GJIm5IjMbCNM7tS3i0BHr3LpKq-UTs
+
+application:
+  security:
+    jwt:
+      secret-key: yourVerySecretKeyForJWTTokenGenerationThatShouldBeLongAndComplex12345!@#$%^&*() # !! IMPORTANT: Change this in production !!
+      expiration: 86400000 # in seconds
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.jdbc.core: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.n8n.ai.core: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
