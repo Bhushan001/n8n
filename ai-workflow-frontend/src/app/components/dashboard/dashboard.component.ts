@@ -1,86 +1,147 @@
-import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { WorkflowCanvasComponent } from '../workflow-canvas/workflow-canvas.component';
+import { Router } from '@angular/router';
 import { IconComponent } from '../shared/icon.component';
+
+interface DashboardStats {
+  totalWorkflows: number;
+  activeWorkflows: number;
+  executionsToday: number;
+  avgExecutionTime: number;
+}
+
+interface RecentExecution {
+  id: string;
+  workflowName: string;
+  status: string;
+  startedAt: Date;
+  duration: number;
+  icon: string;
+  statusClass: string;
+  statusBadgeClass: string;
+}
+
+interface RecentWorkflow {
+  id: string;
+  name: string;
+  isActive: boolean;
+  updatedAt: Date;
+  icon: string;
+  colorClass: string;
+}
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    CommonModule,
-    WorkflowCanvasComponent,
-    IconComponent
-  ],
+  imports: [CommonModule, IconComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit, OnDestroy {
-  @ViewChild(WorkflowCanvasComponent) workflowCanvas!: WorkflowCanvasComponent;
+export class DashboardComponent implements OnInit {
+  isLoading = true;
+  stats: DashboardStats = {
+    totalWorkflows: 0,
+    activeWorkflows: 0,
+    executionsToday: 0,
+    avgExecutionTime: 0
+  };
+  recentExecutions: RecentExecution[] = [];
+  recentWorkflows: RecentWorkflow[] = [];
+
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
-    // Listen for new workflow events from sidebar
-    window.addEventListener('newWorkflow', this.handleNewWorkflowEvent);
+    this.loadDashboardData();
   }
 
-  ngOnDestroy(): void {
-    window.removeEventListener('newWorkflow', this.handleNewWorkflowEvent);
-  }
-
-  private handleNewWorkflowEvent = (): void => {
-    // Small delay to ensure the canvas is ready
+  private loadDashboardData(): void {
+    // Simulate loading data
     setTimeout(() => {
-      this.onNewWorkflow();
-    }, 100);
-  };
+      this.stats = {
+        totalWorkflows: 12,
+        activeWorkflows: 8,
+        executionsToday: 24,
+        avgExecutionTime: 3.2
+      };
 
-  onNewWorkflow(): void {
-    if (this.workflowCanvas) {
-      this.workflowCanvas.clearCanvas();
-    }
-  }
-
-  onSaveWorkflow(): void {
-    if (this.workflowCanvas) {
-      const workflowDefinition = this.workflowCanvas.saveWorkflow();
-      console.log('Saving workflow:', workflowDefinition);
-      this.showNotification('Workflow saved successfully!', 'success');
-    }
-  }
-
-  onExecuteWorkflow(): void {
-    if (this.workflowCanvas) {
-      const workflowDefinition = this.workflowCanvas.saveWorkflow();
-      console.log('Executing workflow:', workflowDefinition);
-      this.showNotification('Workflow execution started!', 'info');
-    }
-  }
-
-  private showNotification(message: string, type: 'success' | 'error' | 'info'): void {
-    const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg text-white z-50 transition-all duration-300 ${
-      type === 'success' ? 'bg-green-500' : 
-      type === 'error' ? 'bg-red-500' : 
-      'bg-blue-500'
-    }`;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    // Animate in
-    setTimeout(() => {
-      notification.style.transform = 'translateX(0)';
-      notification.style.opacity = '1';
-    }, 10);
-    
-    // Animate out and remove
-    setTimeout(() => {
-      notification.style.transform = 'translateX(100%)';
-      notification.style.opacity = '0';
-      setTimeout(() => {
-        if (document.body.contains(notification)) {
-          document.body.removeChild(notification);
+      this.recentExecutions = [
+        {
+          id: '1',
+          workflowName: 'Email Processing Workflow',
+          status: 'Completed',
+          startedAt: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
+          duration: 2.5,
+          icon: 'mail',
+          statusClass: 'bg-green-500',
+          statusBadgeClass: 'bg-green-100 text-green-800'
+        },
+        {
+          id: '2',
+          workflowName: 'Data Analysis Pipeline',
+          status: 'Running',
+          startedAt: new Date(Date.now() - 1000 * 60 * 5), // 5 minutes ago
+          duration: 1.2,
+          icon: 'database',
+          statusClass: 'bg-blue-500',
+          statusBadgeClass: 'bg-blue-100 text-blue-800'
+        },
+        {
+          id: '3',
+          workflowName: 'AI Content Generation',
+          status: 'Failed',
+          startedAt: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
+          duration: 0.8,
+          icon: 'message-circle',
+          statusClass: 'bg-red-500',
+          statusBadgeClass: 'bg-red-100 text-red-800'
         }
-      }, 300);
-    }, 3000);
+      ];
+
+      this.recentWorkflows = [
+        {
+          id: '1',
+          name: 'Email Processing Workflow',
+          isActive: true,
+          updatedAt: new Date(Date.now() - 1000 * 60 * 30),
+          icon: 'mail',
+          colorClass: 'bg-blue-500'
+        },
+        {
+          id: '2',
+          name: 'Data Analysis Pipeline',
+          isActive: true,
+          updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
+          icon: 'database',
+          colorClass: 'bg-green-500'
+        },
+        {
+          id: '3',
+          name: 'AI Content Generation',
+          isActive: false,
+          updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
+          icon: 'message-circle',
+          colorClass: 'bg-purple-500'
+        }
+      ];
+
+      this.isLoading = false;
+    }, 1000);
+  }
+
+  createNewWorkflow(): void {
+    // Navigate to workflow creation or open workflow editor
+    this.router.navigate(['/workflow-editor']);
+  }
+
+  navigateToWorkflows(): void {
+    this.router.navigate(['/workflows']);
+  }
+
+  navigateToExecutions(): void {
+    this.router.navigate(['/executions']);
+  }
+
+  navigateToSettings(): void {
+    this.router.navigate(['/settings']);
   }
 }

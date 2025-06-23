@@ -16,16 +16,16 @@ export interface UserProfile extends User {
   providedIn: 'root'
 })
 export class UserService {
-  private readonly API_URL = 'http://localhost:8080/api/users';
+  private readonly API_URL = 'http://localhost:8080/api/auth';
 
   constructor(private http: HttpClient) {}
 
   getCurrentUserProfile(): Observable<UserProfile> {
-    return this.http.get<UserProfile>(`${this.API_URL}/profile`);
+    return this.http.get<UserProfile>(`${this.API_URL}/me`);
   }
 
   updateUserProfile(profile: Partial<UserProfile>): Observable<UserProfile> {
-    return this.http.put<UserProfile>(`${this.API_URL}/profile`, profile);
+    return this.http.put<UserProfile>(`${this.API_URL}/me`, profile);
   }
 
   uploadAvatar(file: File): Observable<{ avatarUrl: string }> {

@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 // DTO to send through RabbitMQ
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class WorkflowExecutionRequest {
     private Long workflowId;
-    private Long executionId; // The ID of the workflow_execution record
+    private Map<String, Object> input;
+    private Map<String, Object> parameters;
 }

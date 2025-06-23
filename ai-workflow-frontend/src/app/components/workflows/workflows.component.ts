@@ -53,7 +53,7 @@ export class WorkflowsComponent implements OnInit {
         name: 'Customer Onboarding',
         description: 'Automated workflow for new customer registration and setup',
         definitionJson: '{}',
-        active: true,
+        isActive: true,
         createdAt: '2024-01-15T10:30:00Z',
         updatedAt: '2024-01-20T14:45:00Z'
       },
@@ -62,7 +62,7 @@ export class WorkflowsComponent implements OnInit {
         name: 'Invoice Processing',
         description: 'AI-powered invoice validation and processing workflow',
         definitionJson: '{}',
-        active: false,
+        isActive: false,
         createdAt: '2024-01-10T09:15:00Z',
         updatedAt: '2024-01-18T16:20:00Z'
       },
@@ -71,7 +71,7 @@ export class WorkflowsComponent implements OnInit {
         name: 'Support Ticket Routing',
         description: 'Intelligent routing of support tickets based on content analysis',
         definitionJson: '{}',
-        active: true,
+        isActive: true,
         createdAt: '2024-01-05T11:00:00Z',
         updatedAt: '2024-01-22T13:30:00Z'
       }
@@ -79,17 +79,17 @@ export class WorkflowsComponent implements OnInit {
   }
 
   createNewWorkflow(): void {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/workflow-editor']);
   }
 
   editWorkflow(workflow: Workflow): void {
-    this.router.navigate(['/dashboard'], { queryParams: { workflowId: workflow.id } });
+    this.router.navigate(['/workflow-editor', workflow.id]);
   }
 
   toggleWorkflowStatus(workflow: Workflow): void {
-    workflow.active = !workflow.active;
+    workflow.isActive = !workflow.isActive;
     // Here you would call the API to update the workflow
-    console.log(`Workflow ${workflow.name} ${workflow.active ? 'activated' : 'deactivated'}`);
+    console.log(`Workflow ${workflow.name} ${workflow.isActive ? 'activated' : 'deactivated'}`);
   }
 
   deleteWorkflow(workflow: Workflow): void {
@@ -101,7 +101,7 @@ export class WorkflowsComponent implements OnInit {
 
   runWorkflow(workflow: Workflow): void {
     if (workflow.id) {
-      this.workflowService.runWorkflow(workflow.id).subscribe({
+      this.workflowService.runWorkflow({ workflowId: workflow.id }).subscribe({
         next: (result) => {
           console.log('Workflow execution started:', result);
         },

@@ -23,6 +23,9 @@ public class User extends AuditableBaseEntity {
     @Column(unique = true)
     private String username;
 
+    private String firstName;
+    private String lastName;
+
     @Column(unique = true)
     private String phone;
 
